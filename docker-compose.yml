@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  db:
+    container_name: testing_db
+    image: postgres
+    expose:
+      - "${POSTGRES_PORT}"
+    restart: always
+    environment:
+      # get env variables from .env file
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"

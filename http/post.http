@@ -1,0 +1,26 @@
+POST http://localhost:6000/api/v1/post
+Content-Type: application/json
+
+{
+  "title": "My first post",
+  "content": "Hello world!"
+}
+
+###
+GET http://localhost:6000/api/v1/post/4
+###
+GET http://localhost:6000/api/v1/posts
+Content-Type: application/json
+
+###
+PATCH http://localhost:6000/api/v1/post/4
+Content-Type: application/json
+
+{
+  "title": "My first post updated sss" ,
+  "content": "Hello world!"
+}
+
+###
+DELETE http://localhost:6000/api/v1/post/4
+Content-Type: application/json

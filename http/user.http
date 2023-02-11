@@ -1,0 +1,22 @@
+POST http://localhost:6000/api/v1/signup
+Content-Type: application/json
+
+{
+  "email": "quelchx@gmail.com",
+  "password": "password"
+}
+
+### 
+POST http://localhost:6000/api/v1/login
+Content-Type: application/json
+
+{
+  "email": "quelchx@gmail.com",
+  "password": "password"
+}
+
+###
+GET http://localhost:6000/api/v1/user
+
+###
+POST http://localhost:6000/api/v1/logout
