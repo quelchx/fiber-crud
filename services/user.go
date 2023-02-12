@@ -7,22 +7,17 @@ import (
 	"github.com/gofiber/fiber"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
-	"github.com/quelchx/fiber-crud/initializers"
 	model "github.com/quelchx/fiber-crud/models"
+	"github.com/quelchx/fiber-crud/validator"
 	"golang.org/x/crypto/bcrypt"
 )
 
 // checks if the user's email already exists
-func CheckForUser(email string) model.User {
-	var user model.User
-	initializers.GormClient.Where("email = ?", email).First(&user)
-	return user
-}
 
 // sign up a new user (hashes password)
 func SignUp(c *fiber.Ctx) {
 	var user model.User
-	user.ID = uuid.New()
+	user.UUID = uuid.New()
 
 	if err := c.BodyParser(&user); err != nil {
 		c.Status(503).JSON(fiber.Map{
@@ -32,7 +27,7 @@ func SignUp(c *fiber.Ctx) {
 	}
 
 	// check if the user already exists
-	existingUser := CheckForUser(user.Email)
+	existingUser := validator.IsValidUser(user.Email)
 
 	if existingUser.Email != "" {
 		c.Status(409).JSON(fiber.Map{
@@ -51,7 +46,7 @@ func SignUp(c *fiber.Ctx) {
 	}
 
 	user.Password = string(password)
-	initializers.GormClient.Create(&user)
+	model.GormClient.Create(&user)
 
 	c.JSON(user)
 }
@@ -67,7 +62,7 @@ func Login(c *fiber.Ctx) {
 		return
 	}
 
-	existingUser := CheckForUser(user.Email)
+	existingUser := validator.IsValidUser(user.Email)
 
 	if existingUser.Email == "" {
 		c.Status(404).JSON(fiber.Map{
@@ -163,12 +158,12 @@ func GetCurrentUser(c *fiber.Ctx) {
 	}
 
 	var user model.User
-	initializers.GormClient.Where("id = ?", claims["sub"]).First(&user)
+	model.GormClient.Where("id = ?", claims["sub"]).First(&user)
 
 	c.JSON(user)
 }
 
-func UserRoutes(app *fiber.App) {
+func UserRouter(app *fiber.App) {
 	api := app.Group("/api/v1")
 
 	api.Post("/signup", SignUp)

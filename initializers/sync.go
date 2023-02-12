@@ -9,7 +9,7 @@ import (
 
 // will run any migrations on the database
 func SyncDatabase() {
-	migrate := GormClient.AutoMigrate(&model.Post{}, &model.User{})
+	migrate := model.GormClient.AutoMigrate(&model.Post{}, &model.User{})
 
 	if migrate != nil {
 		log.Fatal(color.Ize(color.Red, "Error migrating database"))

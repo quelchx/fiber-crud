@@ -21,8 +21,8 @@ func main() {
 		c.Send("Hello, World!")
 	})
 
-	services.UserRoutes(app)
-	services.PostRoutes(app)
+	services.UserRouter(app)
+	services.PostRouter(app)
 
 	port := os.Getenv("PORT")
 	app.Listen(port)

@@ -2,36 +2,31 @@ package services
 
 import (
 	"github.com/gofiber/fiber"
-	"github.com/google/uuid"
 
-	"github.com/quelchx/fiber-crud/initializers"
+	"github.com/quelchx/fiber-crud/controllers"
 	model "github.com/quelchx/fiber-crud/models"
 )
 
 // create a post
 func CreatePost(c *fiber.Ctx) {
-	var post model.Post
-	post.ID = uuid.New()
+	post, err := controllers.CreatePost()
 
-	if err := c.BodyParser(&post); err != nil {
+	if err != nil {
 		c.Status(503).JSON(fiber.Map{
-			"message": "Error parsing post",
+			"message": "Error creating post",
 		})
 		return
 	}
 
-	initializers.GormClient.Create(&post)
-
 	c.JSON(post)
 }
 
-// get all the posts
 func GetPosts(c *fiber.Ctx) {
-	var posts []model.Post
+	posts, err := controllers.GetAllPosts()
 
-	if err := initializers.GormClient.Find(&posts).Error; err != nil {
-		c.Status(404).JSON(fiber.Map{
-			"message": "Posts not found",
+	if err != nil {
+		c.Status(503).JSON(fiber.Map{
+			"message": "Error getting posts",
 		})
 		return
 	}
@@ -41,17 +36,13 @@ func GetPosts(c *fiber.Ctx) {
 
 // get post by id
 func GetPostById(c *fiber.Ctx) {
-	var post model.Post
-
 	id := c.Params("id")
 
-	// find the post by id and check for errors
-	initializers.GormClient.Find(&post, id)
+	post, err := controllers.GetPostById(id)
 
-	// if there is no post return
-	if post.Title == "" {
-		c.Status(404).JSON(fiber.Map{
-			"message": "Post not found",
+	if err != nil {
+		c.Status(503).JSON(fiber.Map{
+			"message": "Error getting post",
 		})
 		return
 	}
@@ -61,47 +52,27 @@ func GetPostById(c *fiber.Ctx) {
 
 // delete a post by id
 func DeletePost(c *fiber.Ctx) {
-	var post model.Post
-
 	id := c.Params("id")
 
-	// find the post by id and check for errors
-	initializers.GormClient.Find(&post, id)
+	err := controllers.DeletePostById(id)
 
-	// if there is no post return
-	if post.Title == "" {
-		c.Status(404).JSON(fiber.Map{
-			"message": "Post not found",
+	if err != nil {
+		c.Status(503).JSON(fiber.Map{
+			"message": "Error deleting post",
 		})
 		return
 	}
 
-	initializers.GormClient.Delete(&post)
-
 	c.JSON(fiber.Map{
 		"message": "Post deleted",
-		"post":    post,
 	})
 }
 
 // update a post by id
 func UpdatePost(c *fiber.Ctx) {
+	id := c.Params("id")
 	var post model.Post
 
-	id := c.Params("id")
-
-	// check to see if the post exists
-	initializers.GormClient.Find(&post, id)
-
-	// if there is no post return
-	if post.Title == "" {
-		c.Status(404).JSON(fiber.Map{
-			"message": "Post not found",
-		})
-		return
-	}
-
-	// parse the body of the request
 	if err := c.BodyParser(&post); err != nil {
 		c.Status(503).JSON(fiber.Map{
 			"message": "Error parsing post",
@@ -109,15 +80,21 @@ func UpdatePost(c *fiber.Ctx) {
 		return
 	}
 
-	// update the post
-	initializers.GormClient.Save(&post)
+	post, err := controllers.UpdatePostById(id, post)
+
+	if err != nil {
+		c.Status(503).JSON(fiber.Map{
+			"message": "Error updating post",
+		})
+		return
+	}
 
 	c.JSON(post)
 
 }
 
 // post routes
-func PostRoutes(app *fiber.App) {
+func PostRouter(app *fiber.App) {
 	api := app.Group("/api/v1")
 
 	api.Get("/posts", GetPosts)

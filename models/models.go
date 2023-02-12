@@ -7,11 +7,12 @@ import (
 	"gorm.io/gorm"
 )
 
+var GormClient *gorm.DB
+
 // replica of the gorm.Model struct but lowercase fields
 type Base struct {
-	// ID        uint           `gorm:"primarykey" json:"id"`
-	// unique id
-	ID        uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	ID        uint           `gorm:"primary_key" json:"id"`
+	UUID      uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"uuid"`
 	CreatedAt time.Time      `json:"createdAt"`
 	UpdatedAt time.Time      `json:"updatedAt"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deletedAt"`
